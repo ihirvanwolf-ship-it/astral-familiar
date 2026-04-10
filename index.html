@@ -8,28 +8,26 @@
 <style>
   * { box-sizing: border-box; }
 
-  /* ИСПРАВЛЕНИЕ ФОНА ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ */
+  /* ИСПРАВЛЕНИЕ ФОНА (через отдельный фиксированный слой) */
+  #bg-layer {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background-image: url('berkaysimsek38335_A_mystical_ancient_forest_clearing_at_dawn_so.jpg'), url('berkaysimsek38335_A_mystical_ancient_forest_clearing_at_dawn_so.png'), url('berkaysimsek38335_A_mystical_ancient_forest_clearing_at_dawn_so-3.jpg');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    z-index: -10;
+  }
+
   body { 
     margin: 0; padding: 0; 
     font-family: 'Georgia', serif; 
     color: #e0f2e9; 
     text-align: center; 
     user-select: none;
-    background-color: #0d1b13; 
+    background-color: transparent; /* Убрали сплошную заливку */
     min-height: 100vh;
     overflow-x: hidden;
-  }
-
-  /* Хак для iOS/Android Safari: фиксированный фон через псевдоэлемент работает идеально */
-  body::before {
-    content: "";
-    position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    background-image: url('berkaysimsek38335_A_mystical_ancient_forest_clearing_at_dawn_so.jpg');
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    z-index: -2;
   }
 
   #particles-js { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; pointer-events: none; }
@@ -108,10 +106,26 @@
 
   .change-pet-btn { font-size: 0.75rem; color: #a8e6cf; text-decoration: underline; cursor: pointer; margin-top: 15px; opacity: 0.7; display: inline-block; padding: 5px; }
   .sync-btn { font-size: 0.75rem; color: #ffd3b6; text-decoration: underline; cursor: pointer; margin-top: 10px; opacity: 0.7; display: inline-block; padding: 5px;}
+
+  /* МОДАЛЬНОЕ ОКНО СИНХРОНИЗАЦИИ */
+  #sync-modal {
+    display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.85); z-index: 200; align-items: center; justify-content: center;
+    backdrop-filter: blur(5px);
+  }
+  .sync-input-group { display: flex; gap: 10px; margin-bottom: 15px; }
+  .sync-input-group input {
+    flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #a8e6cf;
+    background: rgba(0, 0, 0, 0.6); color: #fff; font-family: monospace; font-size: 0.9rem;
+  }
+  .sync-input-group button { width: auto; padding: 10px 15px; font-size: 1.2rem; }
 </style>
 <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 </head>
 <body>
+
+  <!-- ФОНОВЫЙ СЛОЙ -->
+  <div id="bg-layer"></div>
 
   <div id="selection-screen">
     <h2 style="margin-bottom: 20px;">Кого вы призовете?</h2>
@@ -144,7 +158,6 @@
       </div>
     </div>
 
-    <!-- ИНСАЙТЫ ТЕПЕРЬ ФИКСИРУЮТСЯ НАДЕЖНО -->
     <div class="glass-panel" id="insight-panel">
       <p class="insight-title">Послание фамильяра</p>
       <p class="insight-text" id="insight-msg">Слушай шепот леса...</p>
@@ -169,8 +182,7 @@
       <div>
         <div class="change-pet-btn" onclick="changeFamiliar()">Сменить духа-помощника</div>
         <br>
-        <!-- КНОПКА СИНХРОНИЗАЦИИ -->
-        <div class="sync-btn" onclick="syncProgress()">Синхронизировать устройства</div>
+        <div class="sync-btn" onclick="openSyncModal()">Синхронизировать устройства</div>
       </div>
     </div>
 
@@ -186,6 +198,29 @@
           <a href="https://www.tiktok.com/@ilya.arabadjiev" target="_blank" class="social-btn tt-btn">🎵 Перейти в TikTok</a>
       </div>
       <button onclick="nextStage()">Продолжить Путь</button>
+    </div>
+  </div>
+
+  <!-- ОКНО СИНХРОНИЗАЦИИ -->
+  <div id="sync-modal">
+    <div class="glass-panel" style="width: 90%; max-width: 400px;">
+        <h3 style="margin-top:0; color:#a8e6cf;">Магическая Печать</h3>
+
+        <p style="font-size:0.85rem; color:#dcedc1; margin-bottom: 5px; text-align: left;">1. Скопируйте этот код (чтобы перенести прогресс ОТСЮДА на другое устройство):</p>
+        <div class="sync-input-group">
+            <input type="text" id="sync-code-output" readonly>
+            <button onclick="copySyncCode()" title="Скопировать">📋</button>
+        </div>
+
+        <p style="font-size:0.85rem; color:#dcedc1; margin-bottom: 5px; margin-top: 20px; text-align: left;">2. ИЛИ вставьте чужой код сюда (чтобы загрузить прогресс СЮДА):</p>
+        <div class="sync-input-group">
+            <input type="text" id="sync-code-input" placeholder="Вставьте код...">
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top: 15px;">
+            <button onclick="applySyncCode()">Загрузить</button>
+            <button class="btn-secondary" onclick="closeSyncModal()">Закрыть</button>
+        </div>
     </div>
   </div>
 
@@ -275,7 +310,6 @@
         document.getElementById('game-screen').style.display = 'block';
         document.getElementById('familiar-image').src = petImage;
 
-        // Надежное восстановление инсайта при загрузке
         if (savedInsight && savedInsight !== "") { 
             document.getElementById('insight-panel').style.display = 'block'; 
             document.getElementById('insight-msg').innerText = savedInsight; 
@@ -288,34 +322,62 @@
     function selectPet(imgSrc) { petImage = imgSrc; try { localStorage.setItem('petImage', petImage); } catch(e){} initGame(); }
     function changeFamiliar() { document.getElementById('game-screen').style.display = 'none'; document.getElementById('selection-screen').style.display = 'flex'; }
 
-    // МАГИЧЕСКИЙ ПЕРЕНОС (Синхронизация)
-    function syncProgress() {
+    // --- ЛОГИКА ОКНА СИНХРОНИЗАЦИИ ---
+    function openSyncModal() {
         const code = btoa(`${mana}|${lvl}|${exp}|${lastFeedTime}|${lastBondTime}`);
-        const input = prompt(`Для переноса прогресса на другое устройство скопируйте этот код:
+        document.getElementById('sync-code-output').value = code;
+        document.getElementById('sync-code-input').value = "";
+        document.getElementById('sync-modal').style.display = 'flex';
+    }
 
-${code}
+    function closeSyncModal() {
+        document.getElementById('sync-modal').style.display = 'none';
+    }
 
-ИЛИ вставьте сюда код с другого устройства, чтобы загрузить его прогресс сюда:`, "");
-
-        if (input && input !== code) {
-            try {
-                const parts = atob(input).split('|');
-                if(parts.length >= 5) {
-                    mana = parseInt(parts[0]) || 0;
-                    lvl = parseInt(parts[1]) || 1;
-                    exp = parseInt(parts[2]) || 0;
-                    lastFeedTime = parseInt(parts[3]) || 0;
-                    lastBondTime = parseInt(parts[4]) || 0;
-                    savedInsight = ""; // Сбросим инсайт, так как перешли на новое устройство
-                    save(); 
-                    updateUI();
-                    alert("✨ Дух успешно перемещен на это устройство! Прогресс восстановлен.");
-                }
-            } catch(e) {
-                alert("❌ Руна повреждена. Неверный код синхронизации.");
-            }
+    function copySyncCode() {
+        const copyText = document.getElementById("sync-code-output");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); // Для мобильных
+        try {
+            navigator.clipboard.writeText(copyText.value).then(() => {
+                alert("✨ Код успешно скопирован в буфер обмена!");
+            }).catch(() => {
+                document.execCommand("copy");
+                alert("✨ Код скопирован!");
+            });
+        } catch (err) {
+            document.execCommand("copy");
+            alert("✨ Код скопирован!");
         }
     }
+
+    function applySyncCode() {
+        const input = document.getElementById('sync-code-input').value.trim();
+        if (!input) {
+            alert("Пожалуйста, вставьте код в поле.");
+            return;
+        }
+        try {
+            const parts = atob(input).split('|');
+            if(parts.length >= 5) {
+                mana = parseInt(parts[0]) || 0;
+                lvl = parseInt(parts[1]) || 1;
+                exp = parseInt(parts[2]) || 0;
+                lastFeedTime = parseInt(parts[3]) || 0;
+                lastBondTime = parseInt(parts[4]) || 0;
+                savedInsight = ""; // Сбросим инсайт на новом устройстве
+                save(); 
+                updateUI();
+                closeSyncModal();
+                alert("✨ Дух успешно перемещен на это устройство! Прогресс восстановлен.");
+            } else {
+                alert("❌ Руна повреждена. Неверный код синхронизации.");
+            }
+        } catch(e) {
+            alert("❌ Ошибка чтения кода. Проверьте, что скопировали всё правильно.");
+        }
+    }
+    // ----------------------------------
 
     function checkCooldowns() {
       const now = new Date().getTime();
@@ -369,7 +431,7 @@ ${code}
       const panel = document.getElementById('insight-panel'); const msg = document.getElementById('insight-msg');
       msg.style.opacity = 0; panel.style.display = 'block';
       setTimeout(() => { msg.innerText = newInsight; msg.style.opacity = 1; }, 100); 
-      save(); // Обязательно сохраняем сразу после генерации
+      save(); 
     }
 
     function feed() {
@@ -401,7 +463,7 @@ ${code}
             localStorage.setItem('exp', exp); 
             localStorage.setItem('lastFeedTime', lastFeedTime); 
             localStorage.setItem('lastBondTime', lastBondTime); 
-            localStorage.setItem('savedInsight', savedInsight); // Надежное сохранение инсайта
+            localStorage.setItem('savedInsight', savedInsight); 
         } catch(e) {} 
     }
 
