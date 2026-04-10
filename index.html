@@ -26,7 +26,7 @@
 
   .glass-panel {
     background: rgba(20, 40, 20, 0.4); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 16px; padding: 15px; margin: 15px auto;
+    border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 16px; padding: 15px; margin: 10px auto;
     width: 90%; max-width: 400px; position: relative; z-index: 1; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
   }
 
@@ -34,7 +34,7 @@
   .stats { display: flex; justify-content: space-around; font-size: 1.1rem; }
 
   .familiar-container { 
-    position: relative; margin: 20px auto; width: 45vw; max-width: 220px; height: 45vw; max-height: 220px;
+    position: relative; margin: 15px auto; width: 45vw; max-width: 220px; height: 45vw; max-height: 220px;
     display: flex; align-items: center; justify-content: center; animation: float 4s ease-in-out infinite; 
     cursor: pointer; z-index: 2; transition: transform 0.1s;
   }
@@ -55,22 +55,31 @@
   button:active { background: #a8e6cf; color: #142814; }
   button:disabled { border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.4); background: rgba(0,0,0,0.3); cursor: not-allowed; }
 
+  .btn-secondary { background: rgba(20, 60, 40, 0.5); margin-top: 10px; border-color: #ffd3b6; color: #ffd3b6; font-size: 0.85rem; padding: 10px; }
+  .btn-secondary:active { background: #ffd3b6; color: #142814; }
+
   .reward-box { display: none; text-align: center; }
   .promo-code { font-size: 1.2rem; color: #fff; letter-spacing: 2px; margin: 10px 0; text-shadow: 0 0 10px #a8e6cf; font-weight: bold; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px;}
   .reward-desc { font-size: 0.9rem; color: #dcedc1; margin-bottom: 15px; line-height: 1.4; }
 
+  .social-btn-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+  .social-btn { 
+      text-decoration: none; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 0.9rem; 
+      display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s;
+  }
+  .tg-btn { background: rgba(36, 161, 222, 0.2); border: 1px solid #24A1DE; color: #fff; }
+  .tg-btn:active { background: #24A1DE; }
+  .vk-btn { background: rgba(0, 119, 255, 0.2); border: 1px solid #0077FF; color: #fff; }
+  .vk-btn:active { background: #0077FF; }
+  .tt-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid #FE2C55; color: #fff; }
+  .tt-btn:active { background: #FE2C55; }
+
   .click-effect { position: absolute; color: #a8e6cf; font-size: 1.5rem; animation: floatUp 1s ease-out forwards; pointer-events: none; text-shadow: 0 0 5px #000;}
   @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-60px) scale(1.2); } }
 
-  #insight-popup {
-    position: fixed; top: 20%; left: 50%; transform: translate(-50%, -20px);
-    background: rgba(10, 20, 15, 0.95); border: 1px solid #a8e6cf; border-radius: 12px;
-    padding: 15px; width: 85%; max-width: 350px; z-index: 50; display: none;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8); backdrop-filter: blur(10px);
-    opacity: 0; transition: opacity 0.3s, transform 0.3s;
-  }
-  #insight-popup.show { opacity: 1; transform: translate(-50%, 0); }
-  .insight-text { font-size: 0.95rem; font-style: italic; color: #dcedc1; margin: 0; }
+  #insight-panel { border-color: rgba(255, 211, 182, 0.4); display: none; padding: 10px 15px; }
+  .insight-text { font-size: 0.9rem; font-style: italic; color: #ffd3b6; margin: 0; line-height: 1.4; transition: opacity 0.5s; opacity: 1;}
+  .insight-title { font-size: 0.75rem; text-transform: uppercase; color: rgba(255, 255, 255, 0.5); margin: 0 0 5px 0; letter-spacing: 1px; }
 
   #selection-screen {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -79,18 +88,14 @@
     overflow-y: auto; padding: 20px; backdrop-filter: blur(15px);
   }
   .pet-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
-  .pet-card {
-    background: rgba(255,255,255,0.05); border: 1px solid rgba(168,230,207,0.3);
-    border-radius: 12px; padding: 15px; width: 200px; cursor: pointer; transition: 0.3s;
-  }
+  .pet-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(168,230,207,0.3); border-radius: 12px; padding: 15px; width: 200px; cursor: pointer; transition: 0.3s; }
   .pet-card:active { transform: scale(0.95); background: rgba(168,230,207,0.2); }
   .pet-card img { width: 100px; height: 100px; object-fit: contain; margin-bottom: 10px; filter: drop-shadow(0 0 10px rgba(168, 230, 207, 0.3)); }
 
-  #game-screen { display: none; width: 100%; height: 100%; position: absolute; top:0; left:0; overflow-y: auto; padding-top: 2vh;}
+  #game-screen { display: none; width: 100%; height: 100%; position: absolute; top:0; left:0; overflow-y: auto; padding-top: 2vh; padding-bottom: 5vh;}
 
-  .timer-text { font-size: 0.85rem; color: #ff9999; margin-top: 10px; display: none; }
-
-  .change-pet-btn { font-size: 0.8rem; color: #a8e6cf; text-decoration: underline; cursor: pointer; margin-top: 15px; opacity: 0.7; }
+  .timer-text { font-size: 0.8rem; color: #ff9999; margin-top: 5px; margin-bottom: 0; display: none; text-shadow: 0 1px 2px #000;}
+  .change-pet-btn { font-size: 0.75rem; color: #a8e6cf; text-decoration: underline; cursor: pointer; margin-top: 15px; opacity: 0.7; }
 
   @media screen and (max-width: 600px) { body { background-attachment: scroll; } .familiar-container { margin: 10px auto; } }
 </style>
@@ -106,28 +111,21 @@
         <h3>Мудрый Ворон</h3>
         <p style="font-size:0.8rem; color:#aaa;">Предсказания и руны</p>
       </div>
-
       <div class="pet-card" onclick="selectPet('berkaysimsek38335_A_mystical_forest_cat_with_glowing_amber_eyes-Photoroom.png')">
         <img src="berkaysimsek38335_A_mystical_forest_cat_with_glowing_amber_eyes-Photoroom.png" alt="Кот">
         <h3>Лесной Кот</h3>
         <p style="font-size:0.8rem; color:#aaa;">Интуиция и подсознание</p>
       </div>
-
       <div class="pet-card" onclick="selectPet('berkaysimsek38335_A_gentle_nature_spirit_a_glowing_wisp_of_gold-Photoroom.png')">
-        <img src="berkaysimsek38335_A_gentle_nature_spirit_a_glowing_wisp_of_gold-Photoroom.png" alt="Дух">
-        <h3>Дух медведя</h3>
-        <p style="font-size:0.8rem; color:#aaa;">Защита и гармония</p>
+        <img src="berkaysimsek38335_A_gentle_nature_spirit_a_glowing_wisp_of_gold-Photoroom.png" alt="Медведь">
+        <h3>Лесной Медведь</h3>
+        <p style="font-size:0.8rem; color:#aaa;">Заземление и сила</p>
       </div>
     </div>
   </div>
 
   <div id="game-screen">
     <div id="particles-js"></div>
-
-    <div id="insight-popup">
-      <p class="insight-text" id="insight-msg">Энергия принята.</p>
-    </div>
-
     <div class="glass-panel">
       <h2>Лесной Алтарь</h2>
       <div class="stats">
@@ -136,10 +134,15 @@
       </div>
     </div>
 
+    <div class="glass-panel" id="insight-panel">
+      <p class="insight-title">Послание фамильяра</p>
+      <p class="insight-text" id="insight-msg">Слушай шепот леса...</p>
+    </div>
+
     <div class="familiar-container" onclick="gatherMana(event)" id="familiar">
       <img id="familiar-image" class="familiar-img" src="" alt="Фамильяр" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3004/3004085.png'">
     </div>
-    <p style="color: #a8e6cf; text-shadow: 0 1px 3px #000; position: relative; z-index: 5; font-size: 0.9rem;">Касайтесь духа, чтобы собирать ману</p>
+    <p style="color: #a8e6cf; text-shadow: 0 1px 3px #000; position: relative; z-index: 5; font-size: 0.85rem;">Касайтесь духа, чтобы собирать ману</p>
 
     <div class="glass-panel" id="action-panel">
       <p style="margin:0 0 5px 0; font-size: 0.9rem;">Синтез артефакта: <span id="exp-text">0 / 100</span></p>
@@ -148,14 +151,31 @@
         <button id="feed-btn" onclick="feed()">Провести Ритуал (-20 🍃)</button>
         <p id="cooldown-timer" class="timer-text">Ритуал восстанавливается...</p>
       </div>
+      <div style="margin-top: 15px; border-top: 1px solid rgba(168, 230, 207, 0.2); padding-top: 15px;">
+        <button id="bond-btn" class="btn-secondary" onclick="bond()">Астральный контакт (+10 🍃)</button>
+        <p id="bond-timer" class="timer-text">Дух отдыхает...</p>
+      </div>
       <div class="change-pet-btn" onclick="changeFamiliar()">Сменить духа-помощника</div>
     </div>
 
     <div class="glass-panel reward-box" id="reward">
       <h3 style="color:#a8e6cf; margin-top:0;">Синтез завершен!</h3>
-      <p style="font-size:0.9rem; margin-bottom: 5px;">Фамильяр передал вам дар. Отправьте этот код в личные сообщения @khalbyorn:</p>
+      <p style="font-size:0.9rem; margin-bottom: 5px;">Фамильяр передал вам дар. Скопируйте код и отправьте его мастеру:</p>
       <div class="promo-code" id="promo-text">KHALBYORN-10</div>
       <div class="reward-desc" id="promo-desc">Описание подарка</div>
+
+      <div class="social-btn-container">
+          <a href="https://t.me/khalbyorn" target="_blank" class="social-btn tg-btn">
+              💬 Написать в Telegram
+          </a>
+          <a href="https://vk.com/id16270723" target="_blank" class="social-btn vk-btn">
+              🔵 Написать во ВКонтакте
+          </a>
+          <a href="https://www.tiktok.com/@ilya.arabadjiev" target="_blank" class="social-btn tt-btn">
+              🎵 Перейти в TikTok
+          </a>
+      </div>
+
       <button onclick="nextStage()">Продолжить Путь</button>
     </div>
   </div>
@@ -165,24 +185,19 @@
     if (tg) tg.expand();
 
     let mana = 0; let lvl = 1; let exp = 0; let petImage = '';
-    let lastFeedTime = 0;
+    let lastFeedTime = 0; let lastBondTime = 0; let savedInsight = ""; 
 
     try {
-      mana = parseInt(localStorage.getItem('mana')) || 0;
-      lvl = parseInt(localStorage.getItem('lvl')) || 1;
-      exp = parseInt(localStorage.getItem('exp')) || 0;
-      petImage = localStorage.getItem('petImage') || '';
-      lastFeedTime = parseInt(localStorage.getItem('lastFeedTime')) || 0;
-
-      // ПАТЧ: Исправление имени файла для старых сохранений
+      mana = parseInt(localStorage.getItem('mana')) || 0; lvl = parseInt(localStorage.getItem('lvl')) || 1;
+      exp = parseInt(localStorage.getItem('exp')) || 0; petImage = localStorage.getItem('petImage') || '';
+      lastFeedTime = parseInt(localStorage.getItem('lastFeedTime')) || 0; lastBondTime = parseInt(localStorage.getItem('lastBondTime')) || 0;
+      savedInsight = localStorage.getItem('savedInsight') || "";
       if (petImage && petImage.includes('berkaysimsek') && !petImage.includes('-Photoroom')) {
-          petImage = petImage.replace('.png', '-Photoroom.png');
-          localStorage.setItem('petImage', petImage);
+          petImage = petImage.replace('.png', '-Photoroom.png'); localStorage.setItem('petImage', petImage);
       }
     } catch (e) { console.warn("LocalStorage недоступен"); }
 
     let expNeeded = lvl * 100;
-
     const rewards = [
       { code: "RUNE-TAROT", desc: "Экспресс-расклад на 1 руну/карту: Бесплатно." },
       { code: "DIAGNOSTIC-20", desc: "Скидка 20% на базовую диагностику энергетики." },
@@ -191,169 +206,105 @@
       { code: "RITUAL-25", desc: "Скидка 25% на очищающий ритуал." },
       { code: "TAROT-FULL-15", desc: "Скидка 15% на полный и детальный расклад." }
     ];
-
-    const insights = [
-      "Энергия принята. Запомни: тишина ума — лучшее заклинание.",
-      "Ритуал успешен. Сегодня доверяй своей интуиции больше, чем логике.",
-      "Фамильяр доволен. Негатив обходит тебя стороной.",
-      "Связь установлена. Ответ на твой вопрос придет во сне.",
-      "Мана усвоена. Твое поле уплотняется и защищает тебя.",
-      "Процесс запущен. Обращай внимание на знаки судьбы сегодня.",
-      "Искра вспыхнула. Время отпустить то, что больше не служит тебе."
-    ];
+    const insights = ["Энергия принята. Запомни: тишина ума — лучшее заклинание.", "Ритуал успешен. Сегодня доверяй своей интуиции больше, чем логике.", "Фамильяр доволен. Негатив обходит тебя стороной.", "Связь установлена. Ответ на твой вопрос придет во сне.", "Мана усвоена. Твое поле уплотняется и защищает тебя.", "Процесс запущен. Обращай внимание на знаки судьбы сегодня.", "Искра вспыхнула. Время отпустить то, что больше не служит тебе.", "Отличный поток. Сегодня твои слова имеют особую силу материализации.", "Фамильяр чувствует напряжение — позволь себе отдых в конце дня.", "Обрати внимание на повторяющиеся числа — Вселенная говорит с тобой.", "Энергетический фон выравнивается. Впереди спокойный период.", "Твой внутренний свет сегодня ярче обычного. Не прячь его.", "Защитный барьер обновлен. Никакая чужая злоба тебя не коснется.", "Фамильяр советует: не торопи события, всё произойдет в нужный час.", "Случайная встреча сегодня может нести скрытый смысл.", "Ответ, который ты ищешь, уже внутри тебя. Просто прислушайся.", "Твоя аура очищается. Скоро уйдет чувство тяжести.", "Не игнорируй внезапные мысли — это подсказки Высших сил.", "Сегодня отличный день для планирования будущих побед.", "Магия в мелочах. Обрати внимание на поведение животных вокруг.", "Связь с родом сегодня сильна как никогда. Поблагодари предков.", "Твои страхи — это просто тени. Зажги внутренний свет.", "Ритуал прошел мягко. Ожидай приятную новость издалека.", "Фамильяр собрал для тебя удачу. Смело начинай новое.", "Очисти пространство вокруг себя — это освободит место для чуда.", "Сегодня вода для тебя — лучший лекарь. Прими ванну с солью.", "Твоя энергия притягивает людей. Выбирай, кого впускать в свой круг.", "Не трать силы на споры. Твоя правда не нуждается в доказательствах.", "Обрати внимание на сны с четверга на пятницу — они будут вещими.", "Фамильяр шепчет: кто-то из прошлого думает о тебе.", "Развяжи кармический узел: прости того, на кого давно злишься.", "Сила Земли сейчас поддерживает тебя. Прогулка на природе восстановит ману.", "Сегодня твоя интуиция остра как клинок. Используй это.", "Поток энергии направлен на изобилие. Откройся финансовым возможностям.", "Защита активирована. Можешь смело идти в места скопления людей.", "Помни: твои мысли сегодня формируют твое завтра. Думай о хорошем.", "Фамильяр убрал с твоего пути мелкие препятствия. Путь свободен.", "Обрати внимание на внезапно найденные предметы — это талисманы дня.", "Твой энергетический резерв растет. Скоро будет прорыв.", "Не бойся сказать «нет». Твоя энергия принадлежит только тебе.", "Сегодня день баланса. Уравновесь работу и заботу о себе.", "Скрытое станет явным. Будь готов узнать правду без эмоций.", "Фамильяр мурлычет: скоро твоя давняя проблема разрешится сама собой.", "Магия стихий с тобой. Почувствуй ветер, он унесет тревоги.", "Сегодня Вселенная подкинет тебе проверку. Сохраняй спокойствие.", "Твой Ангел-Хранитель сейчас стоит прямо за твоим правым плечом.", "Энергия отдана не зря. Жди троекратного возврата в виде удачи.", "Освободись от чужих ожиданий. Твой путь уникален.", "Фамильяр советует зажечь сегодня свечу для очищения дома.", "Прислушайся к случайным обрывкам фраз на улице — там есть ответ.", "Сегодня твоя энергоемкость на пике. Можешь свернуть горы.", "Не поддавайся на провокации энергетических вампиров.", "Ритуал завершен. Благодарность — ключ к новым дверям.", "Обрати внимание на свое тело — оно сигнализирует о блоках.", "Фамильяр стер следы негатива в твоем поле. Дыши свободнее.", "Скоро в твою жизнь войдет новый важный человек. Будь открыт.", "Твоя сила воли сегодня творит чудеса материализации.", "Оставь прошлое в прошлом. Впереди слишком много интересного.", "Мана пульсирует. Сегодня ты легко сможешь убедить кого угодно.", "Звезды благосклонны к твоим творческим порывам.", "Сегодня Луна усиливает твою привлекательность и магнетизм.", "Фамильяр напоминает: не забывай пить воду, она проводит энергию.", "Твои корни крепки. Никакие бури не смогут тебя сломить.", "Сегодня отличный день, чтобы загадать желание на перекрестке.", "Сила Солнца наполняет тебя. Действуй смело и открыто.", "Фамильяр чувствует ложь: не доверяй сегодня красивым обещаниям.", "Обрати внимание на левую ладонь. Если чешется — к прибыли.", "Твое биополе сегодня сверкает золотом. Это цвет изобилия.", "Не бойся перемен. Разрушение старого — это рождение нового.", "Ритуал дал плоды. Скоро ты увидишь результат своих стараний.", "Сегодня день внутренней алхимии. Преврати свою грусть в силу.", "Фамильяр защищает твой сон. Сегодня ночью ты выспишься.", "Обрати внимание на облака — их форма может подсказать будущее.", "Твоя чакра сердца открывается. Позволь себе любить.", "Энергия космоса сейчас направляет тебя. Иди по зову сердца.", "Фамильяр отвел от тебя беду, о которой ты даже не подозревал.", "Сегодня удачный день для работы с рунами или таро.", "Не спеши принимать решение. Завтра ситуация прояснится.", "Твоя защита плотная как броня. Никто не пробьет твое спокойствие.", "Мана передана. Твой внутренний компас настроен на успех.", "Фамильяр советует надеть сегодня что-то красное для силы.", "Обращай внимание на запахи — они могут воскресить важные воспоминания.", "Сегодня граница между мирами тонка. Слушай интуицию.", "Твоя энергия структурируется. Хаос уходит из мыслей.", "Вселенная готовит тебе подарок. Освободи для него место.", "Фамильяр рядом. Ты никогда не бываешь по-настоящему одинок.", "Сегодня день отдачи. Сделай доброе дело, и оно вернется сторицей.", "Ритуал сплел новые нити вероятности. Твоя судьба меняется.", "Не зацикливайся на ошибках. В магии важен лишь опыт.", "Сегодня твои руки обладают целительной силой. Погладь питомца или обними близкого.", "Фамильяр впитал твою усталость. Почувствуй прилив бодрости.", "Обрати внимание на мелочи, которые вызывают у тебя улыбку.", "Твоя аура сегодня переливается фиолетовым — цветом мудрости.", "Скрытые резервы открыты. Ты можешь больше, чем думаешь.", "Магия момента: то, о чем ты сейчас подумал, имеет шансы сбыться.", "Фамильяр предупреждает: избегай сплетен, они пачкают ауру.", "Сегодня твой голос имеет гипнотическое влияние. Говори уверенно.", "Ритуал успешен. Путь к твоей цели стал короче на несколько шагов.", "Энергия космоса с тобой. Ты — создатель своей реальности.", "Фамильяр благодарит тебя. Ваша связь стала еще крепче."];
 
     function initGame() {
       if (petImage) {
-        document.getElementById('selection-screen').style.display = 'none';
-        document.getElementById('game-screen').style.display = 'block';
+        document.getElementById('selection-screen').style.display = 'none'; document.getElementById('game-screen').style.display = 'block';
         document.getElementById('familiar-image').src = petImage;
-        initParticles();
-        setInterval(checkCooldown, 1000); 
-        updateUI();
+        if (savedInsight && savedInsight !== "") { document.getElementById('insight-panel').style.display = 'block'; document.getElementById('insight-msg').innerText = savedInsight; }
+        initParticles(); setInterval(checkCooldowns, 1000); updateUI();
       }
     }
 
-    function selectPet(imgSrc) {
-      petImage = imgSrc;
-      try { localStorage.setItem('petImage', petImage); } catch(e){}
-      initGame();
-    }
+    function selectPet(imgSrc) { petImage = imgSrc; try { localStorage.setItem('petImage', petImage); } catch(e){} initGame(); }
+    function changeFamiliar() { document.getElementById('game-screen').style.display = 'none'; document.getElementById('selection-screen').style.display = 'flex'; }
 
-    function changeFamiliar() {
-        document.getElementById('game-screen').style.display = 'none';
-        document.getElementById('selection-screen').style.display = 'flex';
-    }
-
-    function checkCooldown() {
-      const feedBtn = document.getElementById('feed-btn');
-      const timerText = document.getElementById('cooldown-timer');
-
+    function checkCooldowns() {
       const now = new Date().getTime();
-      const cooldownTime = 86400000; // 24 часа 
+      const feedBtn = document.getElementById('feed-btn'); const feedTimerText = document.getElementById('cooldown-timer');
+      const feedCooldown = 86400000; const feedTimePassed = now - lastFeedTime;
+      if (feedTimePassed < feedCooldown && lastFeedTime !== 0) {
+        feedBtn.disabled = true; feedTimerText.style.display = 'block';
+        const timeLeft = feedCooldown - feedTimePassed;
+        const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)); const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        feedTimerText.innerText = `Ритуал восстанавливается... (${hours} ч. ${minutes} мин.)`;
+      } else { feedTimerText.style.display = 'none'; feedBtn.disabled = !(mana >= 20 && exp < expNeeded); }
 
-      const timePassed = now - lastFeedTime;
-
-      if (timePassed < cooldownTime) {
-        feedBtn.disabled = true;
-        timerText.style.display = 'block';
-
-        const timeLeft = cooldownTime - timePassed;
-        const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-        timerText.innerText = `Ритуал восстанавливается... (${hours} ч. ${minutes} мин.)`;
-      } else {
-        timerText.style.display = 'none';
-        if (mana >= 20 && exp < expNeeded) {
-          feedBtn.disabled = false;
-        } else {
-          feedBtn.disabled = true;
-        }
-      }
+      const bondBtn = document.getElementById('bond-btn'); const bondTimerText = document.getElementById('bond-timer');
+      const bondCooldown = 14400000; const bondTimePassed = now - lastBondTime;
+      if (bondTimePassed < bondCooldown && lastBondTime !== 0) {
+        bondBtn.disabled = true; bondTimerText.style.display = 'block';
+        const timeLeft = bondCooldown - bondTimePassed;
+        const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)); const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        bondTimerText.innerText = `Дух отдыхает... (${hours} ч. ${minutes} мин.)`;
+      } else { bondTimerText.style.display = 'none'; bondBtn.disabled = false; }
     }
 
     function updateUI() {
-      document.getElementById('mana').innerText = mana;
-      document.getElementById('lvl').innerText = lvl;
-      document.getElementById('exp-text').innerText = `${exp} / ${expNeeded}`;
-      document.getElementById('exp-fill').style.width = Math.min((exp / expNeeded * 100), 100) + '%';
-
-      checkCooldown();
-
+      document.getElementById('mana').innerText = mana; document.getElementById('lvl').innerText = lvl;
+      document.getElementById('exp-text').innerText = `${exp} / ${expNeeded}`; document.getElementById('exp-fill').style.width = Math.min((exp / expNeeded * 100), 100) + '%';
+      checkCooldowns();
       if (exp >= expNeeded) {
-        document.getElementById('reward').style.display = 'block';
-        document.getElementById('action-panel').style.display = 'none';
-        document.getElementById('familiar').style.pointerEvents = 'none';
-
+        document.getElementById('reward').style.display = 'block'; document.getElementById('action-panel').style.display = 'none';
+        document.getElementById('familiar').style.pointerEvents = 'none'; document.getElementById('insight-panel').style.display = 'none';
         let rewardObj = rewards[(lvl - 1) % rewards.length];
-        document.getElementById('promo-text').innerText = rewardObj.code;
-        document.getElementById('promo-desc').innerText = rewardObj.desc;
+        document.getElementById('promo-text').innerText = rewardObj.code; document.getElementById('promo-desc').innerText = rewardObj.desc;
       } else {
-        document.getElementById('reward').style.display = 'none';
-        document.getElementById('action-panel').style.display = 'block';
+        document.getElementById('reward').style.display = 'none'; document.getElementById('action-panel').style.display = 'block';
         document.getElementById('familiar').style.pointerEvents = 'auto';
+        if (savedInsight !== "") { document.getElementById('insight-panel').style.display = 'block'; }
       }
     }
 
     function gatherMana(event) { 
-      if (exp >= expNeeded) return; 
-      mana += 1; 
-
+      if (exp >= expNeeded) return; mana += 1; 
       if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-
-      const familiar = document.getElementById('familiar');
-      const clickIndicator = document.createElement('div');
-      clickIndicator.className = 'click-effect';
-      clickIndicator.innerText = '+1 🍃';
-      const offsetX = (Math.random() - 0.5) * 60;
-      clickIndicator.style.left = `calc(50% + ${offsetX}px)`;
-      clickIndicator.style.top = '20%';
-      familiar.appendChild(clickIndicator);
-
-      setTimeout(() => clickIndicator.remove(), 1000);
-      save(); updateUI(); 
+      const familiar = document.getElementById('familiar'); const clickIndicator = document.createElement('div');
+      clickIndicator.className = 'click-effect'; clickIndicator.innerText = '+1 🍃';
+      const offsetX = (Math.random() - 0.5) * 60; clickIndicator.style.left = `calc(50% + ${offsetX}px)`; clickIndicator.style.top = '20%';
+      familiar.appendChild(clickIndicator); setTimeout(() => clickIndicator.remove(), 1000); save(); updateUI(); 
     }
 
-    function showInsight() {
-      const popup = document.getElementById('insight-popup');
-      const msg = document.getElementById('insight-msg');
-      msg.innerText = insights[Math.floor(Math.random() * insights.length)];
-
-      popup.style.display = 'block';
-      setTimeout(() => { popup.classList.add('show'); }, 10);
-
-      setTimeout(() => {
-        popup.classList.remove('show');
-        setTimeout(() => { popup.style.display = 'none'; }, 300);
-      }, 4000);
+    function generateNewInsight() {
+      const newInsight = insights[Math.floor(Math.random() * insights.length)]; savedInsight = newInsight;
+      const panel = document.getElementById('insight-panel'); const msg = document.getElementById('insight-msg');
+      msg.style.opacity = 0; panel.style.display = 'block';
+      setTimeout(() => { msg.innerText = newInsight; msg.style.opacity = 1; }, 100); localStorage.setItem('savedInsight', savedInsight);
     }
 
     function feed() {
-      const now = new Date().getTime();
-      const cooldownTime = 86400000;
-
-      if (mana >= 20 && exp < expNeeded && (now - lastFeedTime >= cooldownTime)) {
-        mana -= 20; 
-        exp += 25; 
-        if(exp > expNeeded) exp = expNeeded; 
-
-        lastFeedTime = now; 
-
-        if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-
-        showInsight();
-        save(); updateUI();
+      const now = new Date().getTime(); const cooldownTime = 86400000;
+      if (mana >= 20 && exp < expNeeded && (now - lastFeedTime >= cooldownTime || lastFeedTime === 0)) {
+        mana -= 20; exp += 25; if(exp > expNeeded) exp = expNeeded; 
+        lastFeedTime = now; if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+        generateNewInsight(); save(); updateUI();
       }
     }
 
-    function nextStage() { lvl++; exp = 0; expNeeded = lvl * 100; save(); updateUI(); }
-
-    function save() { 
-      try { 
-        localStorage.setItem('mana', mana); 
-        localStorage.setItem('lvl', lvl); 
-        localStorage.setItem('exp', exp); 
-        localStorage.setItem('lastFeedTime', lastFeedTime);
-      } catch(e) {} 
+    function bond() {
+      const now = new Date().getTime(); const bondCooldown = 14400000; 
+      if ((now - lastBondTime >= bondCooldown || lastBondTime === 0) && exp < expNeeded) {
+        mana += 10; lastBondTime = now;
+        if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+        const familiar = document.getElementById('familiar');
+        familiar.style.filter = "drop-shadow(0 0 30px rgba(255, 211, 182, 0.8))";
+        setTimeout(() => { familiar.style.filter = "drop-shadow(0 0 15px rgba(168, 230, 207, 0.6))"; }, 1000); save(); updateUI();
+      }
     }
+
+    function nextStage() { lvl++; exp = 0; expNeeded = lvl * 100; savedInsight = ""; localStorage.setItem('savedInsight', ""); save(); updateUI(); }
+
+    function save() { try { localStorage.setItem('mana', mana); localStorage.setItem('lvl', lvl); localStorage.setItem('exp', exp); localStorage.setItem('lastFeedTime', lastFeedTime); localStorage.setItem('lastBondTime', lastBondTime); } catch(e) {} }
 
     function initParticles() {
       if(window.particlesJS) {
         particlesJS("particles-js", {
-          "particles": {
-            "number": { "value": 30, "density": { "enable": true, "value_area": 800 } },
-            "color": { "value": ["#a8e6cf", "#dcedc1", "#ffd3b6"] },
-            "shape": { "type": "circle" },
-            "opacity": { "value": 0.6, "random": true, "anim": { "enable": true, "speed": 1, "opacity_min": 0.1, "sync": false } },
-            "size": { "value": 4, "random": true },
-            "line_linked": { "enable": false },
-            "move": { "enable": true, "speed": 1.5, "direction": "top", "random": true, "straight": false, "out_mode": "out", "bounce": false }
-          },
-          "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": false }, "onclick": { "enable": false }, "resize": true } },
-          "retina_detect": true
+          "particles": { "number": { "value": 30, "density": { "enable": true, "value_area": 800 } }, "color": { "value": ["#a8e6cf", "#dcedc1", "#ffd3b6"] }, "shape": { "type": "circle" }, "opacity": { "value": 0.6, "random": true, "anim": { "enable": true, "speed": 1, "opacity_min": 0.1, "sync": false } }, "size": { "value": 4, "random": true }, "line_linked": { "enable": false }, "move": { "enable": true, "speed": 1.5, "direction": "top", "random": true, "straight": false, "out_mode": "out", "bounce": false } },
+          "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": false }, "onclick": { "enable": false }, "resize": true } }, "retina_detect": true
         });
       }
     }
-
     window.onload = () => { initGame(); };
   </script>
 </body>
