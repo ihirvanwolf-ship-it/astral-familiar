@@ -29,7 +29,7 @@
   }
 
   h2 { margin: 5px 0; font-weight: normal; letter-spacing: 2px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); color: #a8e6cf; font-size: 1.5rem; }
-  .stats { display: flex; justify-content: space-around; font-size: 1.1rem; }
+  .stats { display: flex; justify-content: space-around; font-size: 0.95rem; align-items: center; }
 
   .familiar-container { 
     position: relative; margin: 15px auto; width: 45vw; max-width: 220px; height: 45vw; max-height: 220px;
@@ -141,6 +141,7 @@
       <div class="stats">
         <div>Ступень: <span id="lvl">1</span></div>
         <div>Мана: <span id="mana">0</span> 🍃</div>
+        <div style="color: #ffd3b6;">Силы: <span id="energy">300</span> ⚡</div>
       </div>
     </div>
 
@@ -190,8 +191,8 @@
     </div>
 
     <div class="glass-panel reward-box" id="reward">
-      <h3 style="color:#a8e6cf; margin-top:0;">Синтез завершен!</h3>
-      <p style="font-size:0.9rem; margin-bottom: 5px;">Фамильяр передал вам дар. Заскриньте код и отправьте его мастеру:</p>
+      <h3 style="color:#a8e6cf; margin-top:0;">Ступень <span id="reward-lvl"></span> пройдена!</h3>
+      <p style="font-size:0.9rem; margin-bottom: 5px;">Фамильяр передал вам дар. Скопируйте код и отправьте его мастеру:</p>
       <div class="promo-code" id="promo-text">KHALBYORN-10</div>
       <div class="reward-desc" id="promo-desc">Описание подарка</div>
       <div class="social-btn-container">
@@ -199,14 +200,14 @@
           <a href="https://vk.com/id16270723" target="_blank" class="social-btn vk-btn">🔵 Написать во ВКонтакте</a>
           <a href="https://www.tiktok.com/@ilya.arabadjiev" target="_blank" class="social-btn tt-btn">🎵 Перейти в TikTok</a>
       </div>
-      <button onclick="nextStage()">Продолжить Путь</button>
+      <button onclick="nextStage()">Начать новую ступень</button>
     </div>
   </div>
 
   <div id="sync-modal">
     <div class="glass-panel" style="width: 90%; max-width: 400px;">
         <h3 style="margin-top:0; color:#a8e6cf;">Магическая Печать</h3>
-        <p style="font-size:0.85rem; color:#dcedc1; margin-bottom: 5px; text-align: left;">1. Скопируйте этот код (чтобы перенести прогресс ОТСЮДА на другое устройство или браузер):</p>
+        <p style="font-size:0.85rem; color:#dcedc1; margin-bottom: 5px; text-align: left;">1. Скопируйте этот код (чтобы перенести прогресс ОТСЮДА на другое устройство):</p>
         <div class="sync-input-group">
             <input type="text" id="sync-code-output" readonly>
             <button onclick="copySyncCode()" title="Скопировать">📋</button>
@@ -230,6 +231,9 @@
     let lastFeedTime = 0; let lastBondTime = 0; let lastPlayTime = 0; let savedInsight = ""; 
     let playCount = 0; let lastPlayDay = "";
 
+    // Новые переменные для "Батарейки"
+    let dailyTaps = 0; let lastTapDay = ""; const MAX_DAILY_TAPS = 300;
+
     let isPlaying = false; let mgScore = 0; let mgTimeLeft = 15; let mgInterval; let spawnInterval;
 
     try {
@@ -243,21 +247,28 @@
       playCount = parseInt(localStorage.getItem('playCount')) || 0;
       lastPlayDay = localStorage.getItem('lastPlayDay') || "";
       savedInsight = localStorage.getItem('savedInsight') || "";
+      dailyTaps = parseInt(localStorage.getItem('dailyTaps')) || 0;
+      lastTapDay = localStorage.getItem('lastTapDay') || "";
     } catch (e) { console.warn("LocalStorage недоступен"); }
 
-    let expNeeded = lvl * 100;
-        const rewards = [
+    function getExpNeeded(currentLvl) { return Math.min(100 + (currentLvl - 1) * 50, 500); }
+    function getInfuseCost(currentLvl) { return currentLvl * 40; }
+
+    let expNeeded = getExpNeeded(lvl);
+
+    const rewards = [
       { code: "COFFEE-100", desc: "Бесплатный расклад «Кофе при картах» (быстрый ответ на 1 вопрос)." },
       { code: "MAGIC-500", desc: "Скидка 500 ₽ на абсолютно любую услугу или оберег." },
       { code: "KNOT-10", desc: "Скидка 10% на глубокую диагностику ситуации «Узелок»." },
       { code: "SIGIL-15", desc: "Скидка 15% на разработку вашей «Личной сигиллы»." },
-      { code: "KNOT-BONUS", desc: "Бонус: При заказе диагностики «Узелок» — расклад «Луна» в подарок." },
-      { code: "CHAINS-10", desc: "Скидка 10% на ритуал «Снятие оков»." },
-      { code: "ROADS-10", desc: "Скидка 10% на ритуал «Малое открытие дорог»." },
+      { code: "KNOT-BONUS", desc: "Бонус: При заказе диагностики «Узелок» — расклад «Кофе при картах» в подарок." },
+      { code: "CHAINS-10", desc: "Скидка 10% на ритуал «Снятие оков» (только если это покажет диагностика!)." },
+      { code: "ROADS-10", desc: "Скидка 10% на ритуал «Открытие дорог» (только если это покажет диагностика!)." },
       { code: "AMULET-10", desc: "Скидка 10% на создание «Личного амулета» ручной работы." },
       { code: "GUIDE-10", desc: "Скидка 10% на первый месяц магического «Сопровождения» (Контроль/Рост)." },
       { code: "KHALBYORN-MAX", desc: "Секретный дар: Скидка 20% на любую услугу или ритуал (кроме Сопровождения)." }
     ];
+
     const insights = ["Энергия принята. Запомни: тишина ума — лучшее заклинание.", "Ритуал успешен. Сегодня доверяй своей интуиции больше, чем логике.", "Фамильяр доволен. Негатив обходит тебя стороной.", "Связь установлена. Ответ на твой вопрос придет во сне.", "Мана усвоена. Твое поле уплотняется и защищает тебя.", "Процесс запущен. Обращай внимание на знаки судьбы сегодня.", "Искра вспыхнула. Время отпустить то, что больше не служит тебе.", "Отличный поток. Сегодня твои слова имеют особую силу материализации.", "Фамильяр чувствует напряжение — позволь себе отдых в конце дня.", "Обрати внимание на повторяющиеся числа — Вселенная говорит с тобой.", "Энергетический фон выравнивается. Впереди спокойный период.", "Твой внутренний свет сегодня ярче обычного. Не прячь его.", "Защитный барьер обновлен. Никакая чужая злоба тебя не коснется.", "Фамильяр советует: не торопи события, всё произойдет в нужный час.", "Случайная встреча сегодня может нести скрытый смысл.", "Ответ, который ты ищешь, уже внутри тебя. Просто прислушайся.", "Твоя аура очищается. Скоро уйдет чувство тяжести.", "Не игнорируй внезапные мысли — это подсказки Высших сил.", "Сегодня отличный день для планирования будущих побед.", "Магия в мелочах. Обрати внимание на поведение животных вокруг.", "Связь с родом сегодня сильна как никогда. Поблагодари предков.", "Твои страхи — это просто тени. Зажги внутренний свет.", "Ритуал прошел мягко. Ожидай приятную новость издалека.", "Фамильяр собрал для тебя удачу. Смело начинай новое.", "Очисти пространство вокруг себя — это освободит место для чуда.", "Сегодня вода для тебя — лучший лекарь. Прими ванну с солью.", "Твоя энергия притягивает людей. Выбирай, кого впускать в свой круг.", "Не трать силы на споры. Твоя правда не нуждается в доказательствах.", "Обрати внимание на сны с четверга на пятницу — они будут вещими.", "Фамильяр шепчет: кто-то из прошлого думает о тебе.", "Развяжи кармический узел: прости того, на кого давно злишься.", "Сила Земли сейчас поддерживает тебя. Прогулка на природе восстановит ману.", "Сегодня твоя интуиция остра как клинок. Используй это.", "Поток энергии направлен на изобилие. Откройся финансовым возможностям.", "Защита активирована. Можешь смело идти в места скопления людей.", "Помни: твои мысли сегодня формируют твое завтра. Думай о хорошем.", "Фамильяр убрал с твоего пути мелкие препятствия. Путь свободен.", "Обрати внимание на внезапно найденные предметы — это талисманы дня.", "Твой энергетический резерв растет. Скоро будет прорыв.", "Не бойся сказать «нет». Твоя энергия принадлежит только тебе.", "Сегодня день баланса. Уравновесь работу и заботу о себе.", "Скрытое станет явным. Будь готов узнать правду без эмоций.", "Фамильяр мурлычет: скоро твоя давняя проблема разрешится сама собой.", "Магия стихий с тобой. Почувствуй ветер, он унесет тревоги.", "Сегодня Вселенная подкинет тебе проверку. Сохраняй спокойствие.", "Твой Ангел-Хранитель сейчас стоит прямо за твоим правым плечом.", "Энергия отдана не зря. Жди троекратного возврата в виде удачи.", "Освободись от чужих ожиданий. Твой путь уникален.", "Фамильяр советует зажечь сегодня свечу для очищения дома.", "Прислушайся к случайным обрывкам фраз на улице — там есть ответ.", "Сегодня твоя энергоемкость на пике. Можешь свернуть горы.", "Не поддавайся на провокации энергетических вампиров.", "Ритуал завершен. Благодарность — ключ к новым дверям.", "Обрати внимание на свое тело — оно сигнализирует о блоках.", "Фамильяр стер следы негатива в твоем поле. Дыши свободнее.", "Скоро в твою жизнь войдет новый важный человек. Будь открыт.", "Твоя сила воли сегодня творит чудеса материализации.", "Оставь прошлое в прошлом. Впереди слишком много интересного.", "Мана пульсирует. Сегодня ты легко сможешь убедить кого угодно.", "Звезды благосклонны к твоим творческим порывам.", "Сегодня Луна усиливает твою привлекательность и магнетизм.", "Фамильяр напоминает: не забывай пить воду, она проводит энергию.", "Твои корни крепки. Никакие бури не смогут тебя сломить.", "Сегодня отличный день, чтобы загадать желание на перекрестке.", "Сила Солнца наполняет тебя. Действуй смело и открыто.", "Фамильяр чувствует ложь: не доверяй сегодня красивым обещаниям.", "Обрати внимание на левую ладонь. Если чешется — к прибыли.", "Твое биополе сегодня сверкает золотом. Это цвет изобилия.", "Не бойся перемен. Разрушение старого — это рождение нового.", "Ритуал дал плоды. Скоро ты увидишь результат своих стараний.", "Сегодня день внутренней алхимии. Преврати свою грусть в силу.", "Фамильяр защищает твой сон. Сегодня ночью ты выспишься.", "Обрати внимание на облака — их форма может подсказать будущее.", "Твоя чакра сердца открывается. Позволь себе любить.", "Энергия космоса сейчас направляет тебя. Иди по зову сердца.", "Фамильяр отвел от тебя беду, о которой ты даже не подозревал.", "Сегодня удачный день для работы с рунами или таро.", "Не спеши принимать решение. Завтра ситуация прояснится.", "Твоя защита плотная как броня. Никто не пробьет твое спокойствие.", "Мана передана. Твой внутренний компас настроен на успех.", "Фамильяр советует надеть сегодня что-то красное для силы.", "Обращай внимание на запахи — они могут воскресить важные воспоминания.", "Сегодня граница между мирами тонка. Слушай интуицию.", "Твоя энергия структурируется. Хаос уходит из мыслей.", "Вселенная готовит тебе подарок. Освободи для него место.", "Фамильяр рядом. Ты никогда не бываешь по-настоящему одинок.", "Сегодня день отдачи. Сделай доброе дело, и оно вернется сторицей.", "Ритуал сплел новые нити вероятности. Твоя судьба меняется.", "Не зацикливайся на ошибках. В магии важен лишь опыт.", "Сегодня твои руки обладают целительной силой. Погладь питомца или обними близкого.", "Фамильяр впитал твою усталость. Почувствуй прилив бодрости.", "Обрати внимание на мелочи, которые вызывают у тебя улыбку.", "Твоя аура сегодня переливается фиолетовым — цветом мудрости.", "Скрытые резервы открыты. Ты можешь больше, чем думаешь.", "Магия момента: то, о чем ты сейчас подумал, имеет шансы сбыться.", "Фамильяр предупреждает: избегай сплетен, они пачкают ауру.", "Сегодня твой голос имеет гипнотическое влияние. Говори уверенно.", "Ритуал успешен. Путь к твоей цели стал короче на несколько шагов.", "Энергия космоса с тобой. Ты — создатель своей реальности.", "Фамильяр благодарит тебя. Ваша связь стала еще крепче."];
 
     function initGame() {
@@ -273,7 +284,7 @@
     function changeFamiliar() { document.getElementById('game-screen').style.display = 'none'; document.getElementById('selection-screen').style.display = 'flex'; }
 
     function openSyncModal() {
-        const code = btoa(`${mana}|${lvl}|${exp}|${lastFeedTime}|${lastBondTime}|${lastPlayTime}|${playCount}|${lastPlayDay}`);
+        const code = btoa(`${mana}|${lvl}|${exp}|${lastFeedTime}|${lastBondTime}|${lastPlayTime}|${playCount}|${lastPlayDay}|${dailyTaps}|${lastTapDay}`);
         document.getElementById('sync-code-output').value = code; document.getElementById('sync-code-input').value = ""; document.getElementById('sync-modal').style.display = 'flex';
     }
 
@@ -296,6 +307,10 @@
                 lastPlayTime = parts.length >= 6 ? (parseInt(parts[5]) || 0) : 0;
                 playCount = parts.length >= 7 ? (parseInt(parts[6]) || 0) : 0;
                 lastPlayDay = parts.length >= 8 ? parts[7] : "";
+                dailyTaps = parts.length >= 9 ? (parseInt(parts[8]) || 0) : 0;
+                lastTapDay = parts.length >= 10 ? parts[9] : "";
+
+                expNeeded = getExpNeeded(lvl);
                 savedInsight = ""; save(); updateUI(); closeSyncModal(); alert("✨ Прогресс восстановлен.");
             } else { alert("❌ Неверный код."); }
         } catch(e) { alert("❌ Ошибка чтения кода."); }
@@ -304,6 +319,16 @@
     function checkCooldowns() {
       if(isPlaying) return;
       const now = new Date().getTime();
+      const todayStr = new Date().toDateString();
+
+      // Сброс батарейки кликов
+      if (lastTapDay !== "" && lastTapDay !== todayStr) {
+          dailyTaps = 0; lastTapDay = todayStr; save();
+      }
+      // Сброс таймера мини-игры
+      if (lastPlayDay !== "" && lastPlayDay !== todayStr) {
+          playCount = 0; lastPlayDay = todayStr; save();
+      }
 
       const feedBtn = document.getElementById('feed-btn'); const feedTimer = document.getElementById('cooldown-timer');
       const feedTimePassed = now - lastFeedTime;
@@ -313,8 +338,9 @@
         feedTimer.innerText = `Ритуал восстанавливается... (${h} ч. ${m} мин.)`;
       } else { feedTimer.style.display = 'none'; feedBtn.disabled = !(mana >= 20 && exp < expNeeded); }
 
+      const currentInfuseCost = getInfuseCost(lvl);
       const infuseBtn = document.getElementById('infuse-btn');
-      infuseBtn.disabled = !(mana >= 40 && exp < expNeeded);
+      infuseBtn.disabled = !(mana >= currentInfuseCost && exp < expNeeded);
 
       const bondBtn = document.getElementById('bond-btn'); const bondTimer = document.getElementById('bond-timer');
       const bondTimePassed = now - lastBondTime;
@@ -324,17 +350,9 @@
         bondTimer.innerText = `Дух отдыхает... (${h} ч. ${m} мин.)`;
       } else { bondTimer.style.display = 'none'; bondBtn.disabled = false; }
 
-      // Проверка сброса таймера искр (раз в сутки по календарю)
-      const todayStr = new Date().toDateString();
-      if (lastPlayDay !== "" && lastPlayDay !== todayStr) {
-          playCount = 0;
-          lastPlayDay = todayStr;
-          save();
-      }
-
       const playBtn = document.getElementById('play-btn'); const playTimer = document.getElementById('play-timer');
       const playTimePassed = now - lastPlayTime;
-      const requiredWait = playCount * 20 * 60 * 1000; // 20м, 40м, 60м...
+      const requiredWait = playCount * 20 * 60 * 1000;
 
       if (playCount > 0 && playTimePassed < requiredWait && lastPlayTime !== 0) {
         playBtn.disabled = true; playTimer.style.display = 'block';
@@ -351,10 +369,19 @@
       if(isPlaying) return;
       document.getElementById('mana').innerText = mana; document.getElementById('lvl').innerText = lvl;
       document.getElementById('exp-text').innerText = `${exp} / ${expNeeded}`; document.getElementById('exp-fill').style.width = Math.min((exp / expNeeded * 100), 100) + '%';
+
+      const energyLeft = MAX_DAILY_TAPS - dailyTaps;
+      document.getElementById('energy').innerText = energyLeft;
+
+      const currentInfuseCost = getInfuseCost(lvl);
+      document.getElementById('infuse-btn').innerText = `Прямое вливание (-${currentInfuseCost} 🍃) ➔ +10 Синтеза`;
+
       checkCooldowns();
       if (exp >= expNeeded) {
         document.getElementById('reward').style.display = 'block'; document.getElementById('action-panel').style.display = 'none';
         document.getElementById('familiar').style.pointerEvents = 'none'; document.getElementById('insight-panel').style.display = 'none';
+
+        document.getElementById('reward-lvl').innerText = lvl;
         let rewardObj = rewards[(lvl - 1) % rewards.length];
         document.getElementById('promo-text').innerText = rewardObj.code; document.getElementById('promo-desc').innerText = rewardObj.desc;
       } else {
@@ -365,7 +392,21 @@
     }
 
     function gatherMana(event) { 
-      if (exp >= expNeeded || isPlaying) return; mana += 1; 
+      if (exp >= expNeeded || isPlaying) return; 
+
+      const todayStr = new Date().toDateString();
+      if (lastTapDay !== todayStr) { dailyTaps = 0; lastTapDay = todayStr; }
+
+      if (dailyTaps >= MAX_DAILY_TAPS) {
+          const hint = document.getElementById('hint-text');
+          hint.innerText = "Дух устал. Возвращайтесь завтра или ловите искры!";
+          hint.style.color = "#ff9999";
+          if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+          setTimeout(() => { hint.innerText = "Касайтесь духа, чтобы собирать ману"; hint.style.color = "#a8e6cf"; }, 2000);
+          return;
+      }
+
+      mana += 1; dailyTaps++;
       if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
       createFloatingText('+1 🍃', event.clientX || window.innerWidth/2, event.clientY || window.innerHeight/2, '#a8e6cf');
       save(); updateUI(); 
@@ -438,7 +479,7 @@
         mana += mgScore; 
         lastPlayTime = new Date().getTime(); 
         lastPlayDay = new Date().toDateString();
-        playCount++; // Увеличиваем счетчик игр
+        playCount++; 
 
         save();
 
@@ -469,8 +510,9 @@
     }
 
     function infuse() {
-      if (mana >= 40 && exp < expNeeded) {
-        mana -= 40; exp += 10; if(exp > expNeeded) exp = expNeeded; 
+      const currentInfuseCost = getInfuseCost(lvl);
+      if (mana >= currentInfuseCost && exp < expNeeded) {
+        mana -= currentInfuseCost; exp += 10; if(exp > expNeeded) exp = expNeeded; 
         if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
         save(); updateUI();
       }
@@ -487,7 +529,10 @@
       }
     }
 
-    function nextStage() { lvl++; exp = 0; expNeeded = lvl * 100; savedInsight = ""; save(); updateUI(); }
+    function nextStage() { 
+        lvl++; exp = 0; expNeeded = getExpNeeded(lvl); 
+        savedInsight = ""; save(); updateUI(); 
+    }
 
     function save() { 
         try { 
@@ -495,6 +540,7 @@
             localStorage.setItem('lastFeedTime', lastFeedTime); localStorage.setItem('lastBondTime', lastBondTime); 
             localStorage.setItem('lastPlayTime', lastPlayTime); localStorage.setItem('playCount', playCount);
             localStorage.setItem('lastPlayDay', lastPlayDay); localStorage.setItem('savedInsight', savedInsight); 
+            localStorage.setItem('dailyTaps', dailyTaps); localStorage.setItem('lastTapDay', lastTapDay);
         } catch(e) {} 
     }
 
